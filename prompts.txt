@@ -1,0 +1,36 @@
+PROMPT 1: INFER THE PROCESS
+
+Use the Get Data skill to help build a refreshable Power Query workflow in this workbook.
+
+Raw_East and Raw_West are the source Excel tables. TargetExample, on Target_Example, is a prepared example of the desired result for these exact inputs. Use it to understand the required columns, row grain, and values, but do not use TargetExample as a data source for the production query. Do not copy its rows into the output.
+
+The desired output is one row per Region, Branch, SKU, and Date, with Product and Sales alongside them. Sales are USD. The columns, in order, are Region, Branch, SKU, Product, Date, Sales.
+
+Business rules:
+- Raw_East means Region = East; Raw_West means Region = West.
+- A blank Branch means the preceding branch within that same source table. Fill Branch down before reshaping. Never fill down Sales.
+- Keep RowType = Detail only. Subtotal rows repeat the detail and must be excluded.
+- Split Product on the delimiter " | " into SKU and Product. SKU must remain text, including leading zeros.
+- The remaining columns are ISO dates in yyyy-MM-dd format. Unpivot them into Date and Sales, then append the two regional results.
+- A blank amount means not reported. Omit that branch/SKU/date from this reported-sales output and report how many such amounts were excluded. Keep numeric zero as a valid reported sale. Do not fill missing amounts with zero.
+- Date must be a date and Sales a numeric USD amount. Surface conversion errors; do not replace them with zero or silently remove them.
+- Read the complete source tables so added detail rows are included. Support additional ISO date columns; do not hardcode these five dates.
+- Do not aggregate or remove duplicate keys automatically. Report duplicates for review.
+
+First explain the proposed transformations and any ambiguity. Do not edit the workbook yet. State whether you can create a real saved Power Query query on this Excel surface.
+
+PROMPT 2: BUILD THE QUERY (AFTER REVIEWING THE PLAN)
+
+Build the proposed workflow as a saved Power Query query named ReportedSales, and load it to a new worksheet as an Excel table with the same name. Preserve Raw_East, Raw_West, and TargetExample. Use descriptive step names. The source steps must reference only the two raw tables, never the target example or copied output values. If creating the query is not supported here, say so and provide the complete Power Query M code instead of substituting a static table.
+
+After building it, report the actual row count, sales total, count of zero-sales rows, excluded blank amounts, and duplicate Region/Branch/SKU/Date keys. Compare the result with TargetExample by key and values, ignoring row order. Show discrepancies rather than just saying it matches.
+
+PROMPT 2A: M-CODE ROUTE WHEN COPILOT CANNOT SAVE A QUERY
+
+Please provide one concise complete Power Query M query named ReportedSales using the agreed rules, with descriptive steps and a shared preparation function. Preserve errors, zeros, and text SKUs. For this sample only truly blank/null amounts are missing; whitespace-only text should surface as a conversion error. Do not write any cells or create a static output. Do not add extra audit queries; we will independently check the result.
+
+PROMPT 3: EXPLAIN FOR HANDOFF
+
+Explain the saved ReportedSales query as it currently exists. Identify the two source tables, the fill-down boundary, subtotal filter, SKU text conversion, date-column selection, null handling, append, and load destination. Identify any hardcoded dates, values, row counts, paths, or references to TargetExample. Do not change the query.
+
+Write a short handoff covering what the next operator updates, how to refresh, which checks to repeat, and which changes require review. Distinguish refreshing this saved query from asking Copilot to regenerate it. If you cannot inspect an actual query, tell me what you need rather than describing an imagined implementation.
