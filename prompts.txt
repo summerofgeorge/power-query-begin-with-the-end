@@ -1,45 +1,19 @@
-BEFORE PROMPTING
+BEFORE YOU START
 
-Attach desired-output.png to the Copilot conversation and make begin-with-the-end.xlsx available as the source. The image is an excerpt of the desired output, not source data. If the Excel pane cannot accept images, use Copilot Chat with both attachments and request M code for installation in Excel desktop.
+Attach desired-output.png to the Copilot conversation and make begin-with-the-end.xlsx available as the source. If the Excel pane cannot accept images, use Copilot Chat with both attachments and bring the generated M code into desktop Excel.
 
-PROMPT 1: GROUND THE PLAN IN THE TARGET SCREENSHOT
+START THE CONVERSATION
 
-Use the attached desired-output.png as the visual specification for a repeatable Power Query workflow. Use the Get Data skill if it is available on this Excel surface; otherwise help me write Power Query M code.
+Can you turn Raw_East and Raw_West into one table like the attached screenshot? Use Power Query so I can refresh it next week when there are new rows or dates.
 
-Inputs and their roles:
-- The workbook begin-with-the-end.xlsx contains Raw_East and Raw_West. These two Excel tables are the only data sources for the production query.
-- desired-output.png shows the desired cleaned extract, including its six columns and example rows. It shows only the first eight records, not the complete output. Apply its structure to all valid source records. Do not transcribe the image, copy its amounts into the code, or limit the result to the visible rows. Matching the screenshot's colors and formatting is not part of this task.
-- TargetExample, on Target_Example, is the complete manually prepared baseline for these exact inputs. Use it only for a separate comparison after building the query, never as the production query's source. It stays fixed when the raw data changes.
+Fill in the missing branch names, leave out subtotals, separate product codes from names, and put the dates in one column. Keep codes like 001 as text. Blank sales mean not reported; zero is a real sale. Use all the raw data, not just the rows in the picture or the prepared example.
 
-The output columns, in order, must be Region, Branch, SKU, Product, Date, Sales. One row represents one reported amount for one Region/Branch/SKU/Date combination. Row order is not significant. Sales are USD.
+Tell me your plan before making changes.
 
-Transformation rules:
-1. Raw_East supplies Region = East; Raw_West supplies Region = West.
-2. Fill blank Branch cells down within each source table. Do this before reshaping; never fill down Sales or carry a branch between source tables.
-3. Keep only RowType = Detail. Remove Subtotal rows because they repeat the detail, then remove RowType from the output.
-4. Split Product at the exact delimiter " | " into SKU and Product. Keep SKU as text so 001 stays 001.
-5. Unpivot every date-named amount column into Date and Sales, then append the two regions vertically. Date headers use yyyy-MM-dd. Support additional ISO date columns rather than hardcoding the five sample dates.
-6. A blank/null amount means not reported. Omit that observation and report the excluded count. Numeric zero is a valid reported sale and must stay. Do not turn blanks into zeros.
-7. Convert Date to a date and Sales to a numeric USD amount. Surface invalid dates or amounts as errors. Do not silently remove conversion errors or replace them with zero. Whitespace-only text is not a blank/null amount.
-8. Read the complete named tables so added detail rows are included. Do not hardcode row counts, current values, or workbook paths.
-9. Do not aggregate or remove duplicate Region/Branch/SKU/Date keys automatically. Report duplicates for review.
+AFTER REVIEWING THE PLAN
 
-First, confirm that you can read the image and source tables. List the six visible headers and explain the rows showing SKU 001 with sales of 120 and 0. Then summarize the proposed transformations and any ambiguity. If an input is missing or unreadable, tell me; do not guess.
+Looks good. Save this as a Power Query called ReportedSales and load it to a new worksheet. If you can't create the query here, give me the M code to paste into Excel.
 
-Do not edit the workbook yet. State whether you can create a real saved Power Query query here or can only provide M code.
+IF A COLLEAGUE WILL RUN THE REPORT
 
-PROMPT 2: BUILD THE QUERY (AFTER REVIEWING THE PLAN)
-
-Build the proposed workflow as a saved Power Query query named ReportedSales, and load it to a new worksheet as an Excel table with the same name. Preserve Raw_East, Raw_West, and TargetExample. Use descriptive step names. The source steps must reference only the two raw tables, never the target example or copied output values. If creating the query is not supported here, say so and provide the complete Power Query M code instead of substituting a static table.
-
-After building it, report the actual row count, sales total, count of zero-sales rows, excluded blank amounts, and duplicate Region/Branch/SKU/Date keys. Compare the result with TargetExample by key and values, ignoring row order. Show discrepancies rather than just saying it matches.
-
-PROMPT 2A: M-CODE ROUTE WHEN COPILOT CANNOT SAVE A QUERY
-
-Please provide one concise complete Power Query M query named ReportedSales using the agreed rules, with descriptive steps and a shared preparation function. Preserve errors, zeros, and text SKUs. For this sample only truly blank/null amounts are missing; whitespace-only text should surface as a conversion error. Do not write any cells or create a static output. Do not add extra audit queries; we will independently check the result.
-
-PROMPT 3: EXPLAIN FOR HANDOFF
-
-Explain the saved ReportedSales query as it currently exists. Identify the two source tables, the fill-down boundary, subtotal filter, SKU text conversion, date-column selection, null handling, append, and load destination. Identify any hardcoded dates, values, row counts, paths, or references to TargetExample. Do not change the query.
-
-Write a short handoff covering what the next operator updates, how to refresh, which checks to repeat, and which changes require review. Distinguish refreshing this saved query from asking Copilot to regenerate it. If you cannot inspect an actual query, tell me what you need rather than describing an imagined implementation.
+Explain how this query cleans the data in plain English. Then write three short instructions for a colleague who needs to update the source data and refresh it next week.
