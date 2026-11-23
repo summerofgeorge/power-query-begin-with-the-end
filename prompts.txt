@@ -1,23 +1,32 @@
-PROMPT 1: INFER THE PROCESS
+BEFORE PROMPTING
 
-Use the Get Data skill to help build a refreshable Power Query workflow in this workbook.
+Attach desired-output.png to the Copilot conversation and make begin-with-the-end.xlsx available as the source. The image is an excerpt of the desired output, not source data. If the Excel pane cannot accept images, use Copilot Chat with both attachments and request M code for installation in Excel desktop.
 
-Raw_East and Raw_West are the source Excel tables. TargetExample, on Target_Example, is a prepared example of the desired result for these exact inputs. Use it to understand the required columns, row grain, and values, but do not use TargetExample as a data source for the production query. Do not copy its rows into the output.
+PROMPT 1: GROUND THE PLAN IN THE TARGET SCREENSHOT
 
-The desired output is one row per Region, Branch, SKU, and Date, with Product and Sales alongside them. Sales are USD. The columns, in order, are Region, Branch, SKU, Product, Date, Sales.
+Use the attached desired-output.png as the visual specification for a repeatable Power Query workflow. Use the Get Data skill if it is available on this Excel surface; otherwise help me write Power Query M code.
 
-Business rules:
-- Raw_East means Region = East; Raw_West means Region = West.
-- A blank Branch means the preceding branch within that same source table. Fill Branch down before reshaping. Never fill down Sales.
-- Keep RowType = Detail only. Subtotal rows repeat the detail and must be excluded.
-- Split Product on the delimiter " | " into SKU and Product. SKU must remain text, including leading zeros.
-- The remaining columns are ISO dates in yyyy-MM-dd format. Unpivot them into Date and Sales, then append the two regional results.
-- A blank amount means not reported. Omit that branch/SKU/date from this reported-sales output and report how many such amounts were excluded. Keep numeric zero as a valid reported sale. Do not fill missing amounts with zero.
-- Date must be a date and Sales a numeric USD amount. Surface conversion errors; do not replace them with zero or silently remove them.
-- Read the complete source tables so added detail rows are included. Support additional ISO date columns; do not hardcode these five dates.
-- Do not aggregate or remove duplicate keys automatically. Report duplicates for review.
+Inputs and their roles:
+- The workbook begin-with-the-end.xlsx contains Raw_East and Raw_West. These two Excel tables are the only data sources for the production query.
+- desired-output.png shows the desired cleaned extract, including its six columns and example rows. It shows only the first eight records, not the complete output. Apply its structure to all valid source records. Do not transcribe the image, copy its amounts into the code, or limit the result to the visible rows. Matching the screenshot's colors and formatting is not part of this task.
+- TargetExample, on Target_Example, is the complete manually prepared baseline for these exact inputs. Use it only for a separate comparison after building the query, never as the production query's source. It stays fixed when the raw data changes.
 
-First explain the proposed transformations and any ambiguity. Do not edit the workbook yet. State whether you can create a real saved Power Query query on this Excel surface.
+The output columns, in order, must be Region, Branch, SKU, Product, Date, Sales. One row represents one reported amount for one Region/Branch/SKU/Date combination. Row order is not significant. Sales are USD.
+
+Transformation rules:
+1. Raw_East supplies Region = East; Raw_West supplies Region = West.
+2. Fill blank Branch cells down within each source table. Do this before reshaping; never fill down Sales or carry a branch between source tables.
+3. Keep only RowType = Detail. Remove Subtotal rows because they repeat the detail, then remove RowType from the output.
+4. Split Product at the exact delimiter " | " into SKU and Product. Keep SKU as text so 001 stays 001.
+5. Unpivot every date-named amount column into Date and Sales, then append the two regions vertically. Date headers use yyyy-MM-dd. Support additional ISO date columns rather than hardcoding the five sample dates.
+6. A blank/null amount means not reported. Omit that observation and report the excluded count. Numeric zero is a valid reported sale and must stay. Do not turn blanks into zeros.
+7. Convert Date to a date and Sales to a numeric USD amount. Surface invalid dates or amounts as errors. Do not silently remove conversion errors or replace them with zero. Whitespace-only text is not a blank/null amount.
+8. Read the complete named tables so added detail rows are included. Do not hardcode row counts, current values, or workbook paths.
+9. Do not aggregate or remove duplicate Region/Branch/SKU/Date keys automatically. Report duplicates for review.
+
+First, confirm that you can read the image and source tables. List the six visible headers and explain the rows showing SKU 001 with sales of 120 and 0. Then summarize the proposed transformations and any ambiguity. If an input is missing or unreadable, tell me; do not guess.
+
+Do not edit the workbook yet. State whether you can create a real saved Power Query query here or can only provide M code.
 
 PROMPT 2: BUILD THE QUERY (AFTER REVIEWING THE PLAN)
 
