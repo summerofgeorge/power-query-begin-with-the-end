@@ -15,7 +15,7 @@ A fictional branch-sales exercise from Stringfest Analytics. Sales are in USD.
 3. Compare the output against `TargetExample` by Region, Branch, SKU, and Date. Row order is not significant.
 4. Perform the refresh checks below without asking Copilot to regenerate the query.
 
-To install generated M in Excel for Windows, choose Data > Get Data > From Other Sources > Blank Query. In Power Query Editor, open Home > Advanced Editor, replace the code with the complete M query, name the query `ReportedSales`, and choose Close & Load. You can use the supplied `ReportedSales.pq` to practice without Copilot. The ribbon's Get Data command and Copilot's Get Data skill are different entry points.
+To install generated M in Excel for Windows, choose Data > Get Data > From Other Sources > Blank Query. In Power Query Editor, open Home > Advanced Editor, replace the code with the complete M query, name the query `ReportedSales`, and choose Close & Load > Close & Load To... Select Table and New worksheet, leave Add this data to the Data Model unchecked, and click OK. If it has already loaded, right-click the query in Queries & Connections and choose Load To... to set this destination. You can use the supplied `ReportedSales.pq` to practice without Copilot. The ribbon's Get Data command and Copilot's Get Data skill are different entry points.
 
 The observed Copilot session in Excel for the web did not have the Get Data skill enabled; it generated M code instead. Excel desktop is the primary environment for inspecting the code and doing the refresh checks in this exercise. If Copilot requires cloud storage in your account, save your working copy in your organization's approved OneDrive or SharePoint location.
 
@@ -39,7 +39,7 @@ Missing amounts: Cleveland / 014 / 2026-11-05; Pittsburgh / 014 / 2026-11-04; Ci
 Run each check on a fresh copy or restore the prior source before the next check. Keep the target example unchanged.
 
 1. Change Raw_East!C2 from 120 to 145. Refresh. Expect 57 rows and $8,030, with Cleveland / 001 / 2026-11-02 = 145. Restore 120 and refresh again.
-2. Add a column named `2026-11-07` to BOTH raw Excel tables. Enter 10 in each of the 12 Detail rows and 30 in each of the four Subtotal rows. Refresh. Expect 69 rows and $8,125. Ensure the new column is inside each table. Subtotals must not be counted. Remove the added columns to restore the baseline.
+2. Add a column to BOTH raw Excel tables. Format its header cell as Text, then enter `2026-11-07` exactly. Verify the formula bar still shows that ISO text, not a regional date such as `11/7/2026`. Enter 10 in each of the 12 Detail rows and 30 in each of the four Subtotal rows. Refresh. Expect 69 rows and $8,125. Ensure the new column is inside each table. Subtotals must not be counted. Remove the added columns to restore the baseline.
 3. Insert a Detail row in Raw_East's Cleveland block, before its subtotal. Use a blank Branch, Product `099 | Binder clips`, five amounts of 10, and RowType `Detail`. Ensure it is inside the Excel table. Refresh. Expect 62 rows and $8,055, with five new Cleveland / 099 records. Restore the baseline afterward.
 4. On a separate copy, change Raw_East!C2 to `check`. Refresh should expose a conversion error. Do not silently turn that text into zero. A failed refresh can leave the previous loaded table on screen: inspect refresh status before using it.
 
